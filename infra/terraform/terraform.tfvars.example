@@ -1,0 +1,22 @@
+region  = "us-east-1"
+project = "video-reliability"
+env     = "dev"
+
+vpc_cidr = "10.20.0.0/16"
+
+cluster_name = "video-reliability-dev"
+k8s_version  = "1.29"
+
+node_instance_types = ["t3.medium"]
+node_desired_size   = 2
+node_min_size       = 1
+node_max_size       = 3
+
+db_name              = "videodb"
+db_user              = "videouser"
+db_password          = "REPLACE_ME"
+db_instance_class    = "db.t3.micro"
+db_allocated_storage = 20
+
+# Replace with your current public IP/32 for safety
+eks_public_access_cidrs = ["YOUR_PUBLIC_IP/32"]
