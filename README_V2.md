@@ -1,4 +1,4 @@
-# Global Video Reliability Platform — EKS + Observability + RDS (Terraform)
+# Global Video Reliability Platform - EKS + Observability + RDS (Terraform)
 
 ## 1) Project Overview
 
