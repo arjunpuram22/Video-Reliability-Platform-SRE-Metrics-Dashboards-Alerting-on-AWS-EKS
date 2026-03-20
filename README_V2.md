@@ -301,3 +301,21 @@ Finally, I captured the alert list filtered to my rules to show the final alerti
 ![Alert Rules List](screenshots/v2-29-alert-rules-my-rules.png)
 
 ---
+
+## Key Takeaways
+
+- Provisioned a production-style setup using **Terraform + AWS (EKS, ECR, RDS PostgreSQL)**.
+- Deployed an **async job pipeline** on Kubernetes: Upload → Redis queue → Worker.
+- Enabled **automatic metrics scraping** using Prometheus Operator **ServiceMonitors**.
+- Built Grafana dashboards to validate **baseline → spike → recovery** behavior.
+- Implemented and validated alert rules for **processing stalls** and **traffic spikes (4× / 5×)**.
+
+---
+
+## Future Scope (Short)
+
+- Wire the app to **RDS PostgreSQL** to persist job status/history.
+- Add **autoscaling** (HPA/KEDA) for workers based on load/queue depth.
+- Add **Ingress + TLS** for a real endpoint and production-style routing.
+- Introduce **SLOs / error budgets** and more advanced alerting (burn-rate).
+- Add **tracing (OpenTelemetry)** and basic **CI/CD** for ECR + deploy.
