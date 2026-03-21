@@ -1,4 +1,4 @@
-# Video Reliability Platform — SRE Metrics, Dashboards & Alerting on AWS EKS
+# Video Reliability Platform - SRE Metrics, Dashboards & Alerting on AWS EKS
 
 ## Project Overview
 
@@ -21,8 +21,8 @@ The focus is not on "running services" — it's on **proving the system is obser
 - RDS PostgreSQL in private subnets (provisioned for future integration)
 
 **Kubernetes Workloads:**
-- **Namespace: `app`** — upload-service, worker-service, Redis
-- **Namespace: `monitoring`** — kube-prometheus-stack (Prometheus, Grafana, Alertmanager)
+- **Namespace: `app`** - upload-service, worker-service, Redis
+- **Namespace: `monitoring`** - kube-prometheus-stack (Prometheus, Grafana, Alertmanager)
 
 **Observability:**
 - ServiceMonitor-based automatic scraping (no annotation hacks)
@@ -33,15 +33,15 @@ The focus is not on "running services" — it's on **proving the system is obser
 
 ## Design Decisions & Tradeoffs
 
-**Redis over SQS for the queue** — I chose Redis because it keeps the queue layer in-cluster with zero AWS coupling, making the app portable and simpler to debug locally. In production, SQS or a managed Redis (ElastiCache) would be the right call for durability and scaling, but for this project the priority was demonstrating the observability workflow, not queue durability.
+**Redis over SQS for the queue** - I chose Redis because it keeps the queue layer in-cluster with zero AWS coupling, making the app portable and simpler to debug locally. In production, SQS or a managed Redis (ElastiCache) would be the right call for durability and scaling, but for this project the priority was demonstrating the observability workflow, not queue durability.
 
-**Single NAT gateway instead of one per AZ** — This is a cost optimization for a dev environment. In production, I'd deploy one NAT per AZ to avoid cross-AZ traffic charges and eliminate a single point of failure for private subnet egress.
+**Single NAT gateway instead of one per AZ** - This is a cost optimization for a dev environment. In production, I'd deploy one NAT per AZ to avoid cross-AZ traffic charges and eliminate a single point of failure for private subnet egress.
 
-**RDS provisioned but not wired to the app** — I scoped this project to focus deeply on the observability pipeline (metrics → dashboards → alerts → validation under load). RDS is provisioned and secrets are created in Kubernetes to show the infrastructure is ready, but I deliberately deprioritized the database integration to go deeper on alerting and load testing. Wiring RDS for job persistence is the natural next step.
+**RDS provisioned but not wired to the app** - I scoped this project to focus deeply on the observability pipeline (metrics → dashboards → alerts → validation under load). RDS is provisioned and secrets are created in Kubernetes to show the infrastructure is ready, but I deliberately deprioritized the database integration to go deeper on alerting and load testing. Wiring RDS for job persistence is the natural next step.
 
-**Single replicas for all services** — This is a demo-scoped decision to keep costs down. In production, upload-service would run 2+ replicas behind an Ingress, and workers would autoscale using KEDA based on Redis queue depth.
+**Single replicas for all services** - This is a demo-scoped decision to keep costs down. In production, upload-service would run 2+ replicas behind an Ingress, and workers would autoscale using KEDA based on Redis queue depth.
 
-**Grafana-managed alerts instead of PrometheusRule CRDs** — I used Grafana alerting because it allows faster iteration on alert thresholds through the UI during development. For a production setup, I'd codify alerts as PrometheusRule CRDs in version control for GitOps compatibility.
+**Grafana-managed alerts instead of PrometheusRule CRDs** - I used Grafana alerting because it allows faster iteration on alert thresholds through the UI during development. For a production setup, I'd codify alerts as PrometheusRule CRDs in version control for GitOps compatibility.
 
 ---
 
@@ -60,7 +60,7 @@ The focus is not on "running services" — it's on **proving the system is obser
 
 ## Deployment & Validation
 
-### Phase 1 — Infrastructure Provisioning
+### Phase 1 - Infrastructure Provisioning
 
 EKS cluster provisioned via Terraform with 2 worker nodes in private subnets. Namespaces created for workload isolation: `app` for services, `monitoring` for the observability stack.
 
@@ -69,7 +69,7 @@ EKS cluster provisioned via Terraform with 2 worker nodes in private subnets. Na
 
 ---
 
-### Phase 2 — Monitoring Stack Deployment
+### Phase 2 - Monitoring Stack Deployment
 
 Deployed kube-prometheus-stack via Helm into the `monitoring` namespace. Prometheus, Grafana, Alertmanager, kube-state-metrics, and node-exporters all running and healthy.
 
@@ -78,7 +78,7 @@ Deployed kube-prometheus-stack via Helm into the `monitoring` namespace. Prometh
 
 ---
 
-### Phase 3 — Application Deployment
+### Phase 3 - Application Deployment
 
 Redis deployed as the in-cluster queue. Application config loaded via ConfigMap, RDS credentials stored as a Kubernetes Secret. Container images built and pushed to ECR, then deployed to the `app` namespace.
 
@@ -93,7 +93,7 @@ Redis deployed as the in-cluster queue. Application config loaded via ConfigMap,
 
 ---
 
-### Phase 4 — Service Validation
+### Phase 4 - Service Validation
 
 All application pods running in the `app` namespace. Services and endpoints verified for internal connectivity — upload-service, worker-service, and Redis all reachable via ClusterIP.
 
@@ -102,7 +102,7 @@ All application pods running in the `app` namespace. Services and endpoints veri
 
 ---
 
-### Phase 5 — End-to-End Pipeline Proof
+### Phase 5 - End-to-End Pipeline Proof
 
 This is the key validation. I sent a job request to upload-service, confirmed it was accepted and enqueued (queue depth increased), verified the worker picked it up and processed it successfully, and confirmed the metrics endpoint was updating. This proves the full pipeline works: **request → queue → worker → metrics**.
 
@@ -110,7 +110,7 @@ This is the key validation. I sent a job request to upload-service, confirmed it
 
 ---
 
-### Phase 6 — Observability Validation
+### Phase 6 - Observability Validation
 
 Prometheus is scraping both application endpoints via ServiceMonitors (targets show UP). Key application metrics confirmed in Prometheus: `upload_requests_total`, `jobs_processed_total`, `worker_active_jobs`. Grafana's Prometheus datasource verified and working.
 
@@ -121,7 +121,7 @@ Prometheus is scraping both application endpoints via ServiceMonitors (targets s
 
 ---
 
-### Phase 7 — Dashboards & Alerting
+### Phase 7 - Dashboards & Alerting
 
 **Custom application dashboard** built with three panels focused on SRE signals: upload request volume, worker processing throughput, and worker active job count.
 
@@ -134,7 +134,7 @@ Prometheus is scraping both application endpoints via ServiceMonitors (targets s
 
 ---
 
-### Phase 8 — Load Testing & Spike Alerts
+### Phase 8 - Load Testing & Spike Alerts
 
 I captured the system's behavior across three states to prove observability under real conditions:
 
@@ -142,23 +142,23 @@ I captured the system's behavior across three states to prove observability unde
 
 ![Before Load](screenshots/v2-24-grafana-before-load.png)
 
-**During load spike** — Generated burst traffic. Upload request rate spiked from ~2 to ~20 req/min, worker throughput increased proportionally, active jobs rose as the worker processed the backlog.
+**During load spike** - Generated burst traffic. Upload request rate spiked from ~2 to ~20 req/min, worker throughput increased proportionally, active jobs rose as the worker processed the backlog.
 
 ![During Load](screenshots/v2-25-grafana-during-load.png)
 
-**Recovery (after load)** — Traffic stopped. System returned to steady state — worker drained the queue and metrics settled. This confirms the system recovers cleanly from burst traffic without manual intervention.
+**Recovery (after load)** - Traffic stopped. System returned to steady state — worker drained the queue and metrics settled. This confirms the system recovers cleanly from burst traffic without manual intervention.
 
 ![After Load](screenshots/v2-26-grafana-after-load.png)
 
-**4× spike alert** — Fires when `60 * rate(upload_requests_total[2m])` exceeds 80 (4× the baseline of ~20 req/min). Validated with FIRING state.
+**4× spike alert** - Fires when `60 * rate(upload_requests_total[2m])` exceeds 80 (4× the baseline of ~20 req/min). Validated with FIRING state.
 
 ![4x Spike Alert Firing](screenshots/v2-27-alert-4x-spike-FIRING.png)
 
-**5× spike alert** — Fires when the same rate exceeds 100. Validated with FIRING state at 228 req/min.
+**5× spike alert** - Fires when the same rate exceeds 100. Validated with FIRING state at 228 req/min.
 
 ![5x Spike Alert Firing](screenshots/v2-28-alert-5x-spike-firing.png)
 
-**Alert rules summary** — All custom alert rules visible under the `sre-eval` folder.
+**Alert rules summary** - All custom alert rules visible under the `sre-eval` folder.
 
 ![Alert Rules List](screenshots/v2-29-alert-rules-my-rules.png)
 
@@ -168,19 +168,19 @@ I captured the system's behavior across three states to prove observability unde
 
 If I were taking this to production, here's what I'd prioritize:
 
-- **Health/readiness probes** — Upload-service already exposes `/health`; I'd wire this as a readiness probe and add a TCP probe on the worker's metrics port to enable proper pod lifecycle management.
-- **Dependency pinning** — I'd pin all Python packages to exact versions and use a lockfile to guarantee reproducible builds across environments.
-- **Terraform remote state** — I'd add an S3 + DynamoDB backend for state locking, enabling safe collaboration and CI/CD-driven infrastructure changes.
-- **Worker graceful shutdown** — I'd implement a processing list pattern in Redis (move jobs to an in-progress list, remove on completion) so interrupted jobs are automatically retried instead of lost.
-- **CI/CD pipeline** — I'd add GitHub Actions to automate image builds, ECR pushes, and Kubernetes deployments on every merge to main.
-- **Smarter stall detection** — The current alert fires on `worker_active_jobs < 1`, which triggers during legitimate idle periods. I'd refine this to correlate queue depth with worker activity, so it only fires when there's pending work and no processing.
+- **Health/readiness probes** - Upload-service already exposes `/health`; I'd wire this as a readiness probe and add a TCP probe on the worker's metrics port to enable proper pod lifecycle management.
+- **Dependency pinning** - I'd pin all Python packages to exact versions and use a lockfile to guarantee reproducible builds across environments.
+- **Terraform remote state** - I'd add an S3 + DynamoDB backend for state locking, enabling safe collaboration and CI/CD-driven infrastructure changes.
+- **Worker graceful shutdown** - I'd implement a processing list pattern in Redis (move jobs to an in-progress list, remove on completion) so interrupted jobs are automatically retried instead of lost.
+- **CI/CD pipeline** - I'd add GitHub Actions to automate image builds, ECR pushes, and Kubernetes deployments on every merge to main.
+- **Smarter stall detection** - The current alert fires on `worker_active_jobs < 1`, which triggers during legitimate idle periods. I'd refine this to correlate queue depth with worker activity, so it only fires when there's pending work and no processing.
 
 ---
 
 ## Future Scope
 
-- **RDS integration** — Wire upload-service and worker-service to PostgreSQL to persist job status, processing history, and failure records. The infrastructure and secrets are already in place.
-- **Worker autoscaling with KEDA** — Add KEDA ScaledObject targeting Redis list length (`video_jobs`) so workers scale proportionally to queue backpressure. This directly addresses the "stall under load" problem the alerts detect.
-- **Ingress + TLS** — Add an AWS ALB Ingress Controller with ACM certificate for a production-grade endpoint instead of port-forwarding.
-- **SLOs and burn-rate alerting** — Define SLOs (e.g., 99.5% of jobs processed within 30s) and implement multi-window burn-rate alerts instead of static thresholds.
-- **Distributed tracing (OpenTelemetry)** — Add trace context propagation from upload-service through Redis to worker-service to enable end-to-end request tracing in Grafana Tempo.
+- **RDS integration** - Wire upload-service and worker-service to PostgreSQL to persist job status, processing history, and failure records. The infrastructure and secrets are already in place.
+- **Worker autoscaling with KEDA** - Add KEDA ScaledObject targeting Redis list length (`video_jobs`) so workers scale proportionally to queue backpressure. This directly addresses the "stall under load" problem the alerts detect.
+- **Ingress + TLS** - Add an AWS ALB Ingress Controller with ACM certificate for a production-grade endpoint instead of port-forwarding.
+- **SLOs and burn-rate alerting** - Define SLOs (e.g., 99.5% of jobs processed within 30s) and implement multi-window burn-rate alerts instead of static thresholds.
+- **Distributed tracing (OpenTelemetry)** - Add trace context propagation from upload-service through Redis to worker-service to enable end-to-end request tracing in Grafana Tempo.
