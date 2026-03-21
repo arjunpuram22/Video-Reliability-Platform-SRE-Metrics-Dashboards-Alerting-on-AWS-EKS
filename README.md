@@ -164,16 +164,16 @@ I captured the system's behavior across three states to prove observability unde
 
 ---
 
-## Known Limitations
+## Production Considerations
 
-These are intentional scoping decisions or gaps I'd address in a production environment:
+If I were taking this to production, here's what I'd prioritize:
 
-- **No health/readiness probes on application pods** — Redis has them, but upload-service and worker-service don't. The upload-service already exposes `/health` which could be wired as a probe.
-- **Unpinned Python dependencies** — `requirements.txt` files don't pin versions, making builds non-reproducible. Production would use exact pins or a lockfile.
-- **No Terraform remote state backend** — State is stored locally. Production would use S3 + DynamoDB for state locking and team collaboration.
-- **Worker has no graceful shutdown** — If the pod is killed mid-job, that job is lost. A production worker would use a processing list pattern or acknowledge-based queue to enable retries.
-- **No CI/CD pipeline** — Image builds and deployments are manual. Production would use GitHub Actions or similar for automated build → push → deploy.
-- **Stall alert fires during legitimate idle** — The `worker_active_jobs < 1` condition fires even when the queue is empty, which would be noisy in low-traffic environments. A production alert would correlate queue depth with worker activity.
+- **Health/readiness probes** — Upload-service already exposes `/health`; I'd wire this as a readiness probe and add a TCP probe on the worker's metrics port to enable proper pod lifecycle management.
+- **Dependency pinning** — I'd pin all Python packages to exact versions and use a lockfile to guarantee reproducible builds across environments.
+- **Terraform remote state** — I'd add an S3 + DynamoDB backend for state locking, enabling safe collaboration and CI/CD-driven infrastructure changes.
+- **Worker graceful shutdown** — I'd implement a processing list pattern in Redis (move jobs to an in-progress list, remove on completion) so interrupted jobs are automatically retried instead of lost.
+- **CI/CD pipeline** — I'd add GitHub Actions to automate image builds, ECR pushes, and Kubernetes deployments on every merge to main.
+- **Smarter stall detection** — The current alert fires on `worker_active_jobs < 1`, which triggers during legitimate idle periods. I'd refine this to correlate queue depth with worker activity, so it only fires when there's pending work and no processing.
 
 ---
 
