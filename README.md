@@ -122,9 +122,12 @@ Prometheus is scraping both application endpoints via ServiceMonitors (targets s
 
 ### Phase 7 - Dashboards & Alerting
 
-**Custom application dashboard** built with three panels focused on SRE signals: upload request volume, worker processing throughput, and worker active job count.
+I first verified Grafana could visualize Kubernetes workload data using the built-in namespace dashboard for the `app` namespace.
 
 ![Grafana K8s Namespace Pods Dashboard](screenshots/v2-21-grafana-k8s-namespace-pods-dashboard.png)
+
+Then I built a **custom application dashboard** with three panels focused on SRE signals: upload request volume, worker processing throughput, and worker active job count.
+
 ![Grafana App Dashboard](screenshots/v2-22-grafana-app-dashboard.png)
 
 **Worker stall alert** — Configured to fire when `worker_active_jobs` drops below 1 while the queue has pending work. This detects the failure mode where a worker pod is running but not processing. Validated by capturing the FIRING state.
