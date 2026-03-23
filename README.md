@@ -4,7 +4,7 @@
 
 This project demonstrates a **production-style SRE workflow** for a video background-processing pipeline deployed on AWS EKS and instrumented with Prometheus + Grafana.
 
-The focus is not on "running services" — it's on **proving the system is observable, alertable, and behaves correctly under load.** Every component was validated end-to-end: from infrastructure provisioning through job processing to alert firing under real traffic spikes.
+The focus is not on "running services" - it's on **proving the system is observable, alertable, and behaves correctly under load.** Every component was validated end-to-end: from infrastructure provisioning through job processing to alert firing under real traffic spikes.
 
 **Pipeline:** Upload Service (FastAPI) → Redis Queue → Worker Service → Prometheus Metrics → Grafana Dashboards + Alerts
 
@@ -116,19 +116,21 @@ Prometheus is scraping both application endpoints via ServiceMonitors (targets s
 
 ![Prometheus Targets App Scrape](screenshots/v2-16-prometheus-targets-app-scrape.png)
 ![Prometheus App Metrics Query](screenshots/v2-17-prometheus-app-metrics-query.png)
-![ServiceMonitor Targets](screenshots/v2-19-prometheus-targets-app-servicemonitors.png)
 ![Grafana Prometheus Datasource](screenshots/v2-20-grafana-prometheus-datasource.png)
 
 ---
 
 ### Phase 7 - Dashboards & Alerting
 
-**Custom application dashboard** built with three panels focused on SRE signals: upload request volume, worker processing throughput, and worker active job count.
+I first verified Grafana could visualize Kubernetes workload data using the built-in namespace dashboard for the `app` namespace.
 
 ![Grafana K8s Namespace Pods Dashboard](screenshots/v2-21-grafana-k8s-namespace-pods-dashboard.png)
+
+Then I built a **custom application dashboard** with three panels focused on SRE signals: upload requests total, jobs processed total, and worker active jobs.
+
 ![Grafana App Dashboard](screenshots/v2-22-grafana-app-dashboard.png)
 
-**Worker stall alert** — Configured to fire when `worker_active_jobs` drops below 1 while the queue has pending work. This detects the failure mode where a worker pod is running but not processing. Validated by capturing the FIRING state.
+**Worker stall alert** - Configured to fire when `worker_active_jobs` drops below 1 while the queue has pending work. This detects the failure mode where a worker pod is running but not processing. Validated by capturing the FIRING state.
 
 ![Stall Alert Firing](screenshots/v2-23-alert-firing.png)
 
@@ -138,7 +140,7 @@ Prometheus is scraping both application endpoints via ServiceMonitors (targets s
 
 I captured the system's behavior across three states to prove observability under real conditions:
 
-**Baseline (before load)** — System stable, flat metrics, no alerts firing.
+**Baseline (before load)** - System stable, flat metrics, no alerts firing.
 
 ![Before Load](screenshots/v2-24-grafana-before-load.png)
 
@@ -154,7 +156,7 @@ I captured the system's behavior across three states to prove observability unde
 
 ![4x Spike Alert Firing](screenshots/v2-27-alert-4x-spike-FIRING.png)
 
-**5× spike alert** - Fires when the same rate exceeds 100. Validated with FIRING state at 228 req/min.
+**5× spike alert** - Fires when the same rate exceeds 100. Validated with FIRING state.
 
 ![5x Spike Alert Firing](screenshots/v2-28-alert-5x-spike-firing.png)
 
