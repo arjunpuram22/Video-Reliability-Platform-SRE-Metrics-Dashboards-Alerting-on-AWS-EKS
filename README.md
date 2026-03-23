@@ -4,7 +4,7 @@
 
 This project demonstrates a **production-style SRE workflow** for a video background-processing pipeline deployed on AWS EKS and instrumented with Prometheus + Grafana.
 
-The focus is not on "running services" — it's on **proving the system is observable, alertable, and behaves correctly under load.** Every component was validated end-to-end: from infrastructure provisioning through job processing to alert firing under real traffic spikes.
+The focus is not on "running services" - it's on **proving the system is observable, alertable, and behaves correctly under load.** Every component was validated end-to-end: from infrastructure provisioning through job processing to alert firing under real traffic spikes.
 
 **Pipeline:** Upload Service (FastAPI) → Redis Queue → Worker Service → Prometheus Metrics → Grafana Dashboards + Alerts
 
